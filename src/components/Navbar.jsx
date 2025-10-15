@@ -12,12 +12,12 @@ function Navbar() {
   // NavLink için stil fonksiyonu
   const navLinkStyles = ({ isActive }) => 
     isActive 
-      ? 'bg-gray-500 px-3 py-2 text-gray-500 rounded-md text-sm font-medium' 
-      : 'text-gray-600 hover:bg-gray-200 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium';
+      ? 'bg-blue-500 px-3 py-2 text-white    text-bold text-sm font-medium' 
+      : 'bg-gray-100 px-3 py-2 text-gray-600 text-bold text-sm font-medium';
 
   return (
-    <nav className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="flex justify-center bg-white shadow-sm sticky top-0 z-50">
+      <div className="w-full px-96">
         <div className="flex items-center justify-between h-fit py-4">
           
           {/* Sol Taraf: Logo ve Ana Linkler (Desktop) */}
@@ -25,37 +25,25 @@ function Navbar() {
             <Link to="/" className="text-xl font-bold text-blue-600">
               🐾 Evine Dön
             </Link>
-            <div className="hidden md:block ml-10">
-              <div className="flex items-baseline space-x-4">
-                <NavLink to="/ilanlar" className={navLinkStyles}>
-                  Tüm İlanlar
-                </NavLink>
-                {/* Buraya başka ana linkler eklenebilir */}
-              </div>
-            </div>
           </div>
 
-          <section>
-            <div className="w-[30vw] bg-red-200">
-              <div className="flex flex-row gap-4">
+          <section className='bg-red-200 hidden lg:flex flex-row'>
                 <input 
                   type="text" 
                   placeholder="Şehir veya ilçe ara..."
-                  className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                  className="w-full p-1 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                 />
-                <button className="w-16 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md">
+                <button className="w-16 bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4">
                   Ara
                 </button>
-              </div>
-            </div>
           </section>
 
           {/* Sağ Taraf: Butonlar ve Profil (Desktop) */}
           <div className="hidden lg:block">
-            <div className="ml-4 flex items-center md:ml-6 space-x-4">
+            <div className="flex items-center space-x-4">
               <Link
                 to="/ilan-ver"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-md transition duration-300"
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 transition duration-300"
               >
                 Yeni İlan Ver
               </Link>
@@ -64,7 +52,7 @@ function Navbar() {
                   <NavLink to="/panelim" className={navLinkStyles}>
                     Panelim
                   </NavLink>
-                  <button onClick={() => setIsLoggedIn(false)} className="text-gray-600 hover:text-gray-900">
+                  <button onClick={() => setIsLoggedIn(false)} className="text-gray-500 hover:text-gray-600">
                     Çıkış Yap
                   </button>
                 </>
@@ -106,17 +94,17 @@ function Navbar() {
       {isMenuOpen && (
         <div className="absolute top-full left-0 lg:hidden bg-white w-full border" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <NavLink to="/ilanlar" className={navLinkStyles + ' block'}>Tüm İlanlar</NavLink>
-            <NavLink to="/ilan-ver" className={navLinkStyles + ' block'}>Yeni İlan Ver</NavLink>
+            <NavLink to="/ilanlar" className={navLinkStyles + ' block bg-gray-800 text-gray-500'}>Tüm İlanlar</NavLink>
+            <NavLink to="/ilan-ver" className={navLinkStyles + ' block bg-gray-800 text-gray-500'}>Yeni İlan Ver</NavLink>
             {isLoggedIn ? (
               <>
-                <NavLink to="/panelim" className={navLinkStyles + ' block'}>Panelim</NavLink>
+                <NavLink to="/panelim" className={navLinkStyles + ' block bg-gray-800 text-gray-500'}>Panelim</NavLink>
                 <button onClick={() => { setIsLoggedIn(false); setIsMenuOpen(false); }} className="text-gray-600 hover:bg-gray-200 w-full text-left px-3 py-2 rounded-md text-sm font-medium">
                   Çıkış Yap
                 </button>
               </>
             ) : (
-              <NavLink to="/giris" className={navLinkStyles + ' block'}>Giriş Yap / Kayıt Ol</NavLink>
+              <NavLink to="/giris" className={navLinkStyles + ' block bg-gray-800 text-gray-500'}>Giriş Yap / Kayıt Ol</NavLink>
             )}
           </div>
         </div>

@@ -15,7 +15,7 @@ const samplePostToEdit = {
 
 function EditPostPage() {
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="max-w-[1200px]">
       <div className="bg-white p-6 sm:p-8 rounded-lg shadow-md">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">

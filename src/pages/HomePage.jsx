@@ -1,6 +1,8 @@
 // src/pages/HomePage.jsx
 
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import PostCard from "../components/PostCard";
+import { Link } from 'react-router-dom';
 
 // Örnek ilan verileri (daha sonra Supabase'den gelecek)
 const samplePosts = [
@@ -46,24 +48,26 @@ function HomePage() {
   return (
     <div className="space-y-12">
       {/* 1. Hero Section: Karşılama Alanı */}
-      <section className="flex lg:flex-row flex-col items-center justify-center text-center bg-white py-12 px-4 rounded-lg border-2 lg:space-x-10 border-gray-200">
-        <div className="">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-800">
+      <section className="flex flex-col items-center justify-center text-center  p-4 rounded-lg  space-y-4  max-w-[1200px]">
+        <h1 className="lg:text-5xl text-2xl font-extrabold text-gray-800">
           Kayıp Dostlarımızı <span className="font-bold text-blue-600">Evine Dön</span>dürelim
         </h1>
-        <p className="mt-4 text-lg text-gray-600 max-w-[400px] mx-auto">
-          <span className="text-xl font-bold text-blue-600">Evine Dön</span>, kaybolan evcil hayvanlarınızı bulmanıza veya bulduğunuz sahipsiz dostlarımızı yuvalarına kavuşturmanıza yardımcı olan bir topluluk platformudur.
+        <div className="flex lg:flex-row flex-col items-center justify-between lg:space-y-0 space-y-4 p-2 lg:space-x-2 w-full">
+        <p className="text-sm lg:text-xl text-gray-600 w-full p-1">
+          <span className="font-bold text-blue-600">Evine Dön</span>, kaybolan evcil hayvanlarınızı bulmanıza veya bulduğunuz sahipsiz dostlarımızı yuvalarına kavuşturmanıza yardımcı olan bir topluluk platformudur.
         </p>
-        </div>
         <img src="/exotic-pet-home.jpg" alt="" className="lg:h-64 h-32 w-auto rounded border" />
+        </div>
       </section>
 
-      {/* 2. Arama ve Filtreleme Alanı */}
-      
-
-      {/* 3. Son İlanlar */}
+      {/* 2. Son İlanlar */}
       <section>
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Son İlanlar</h2>
+        <div className="flex flex-row items-center justify-between pb-5">
+        <h2 className="text-3xl font-bold text-gray-800">Son İlanlar</h2>
+        <Link to={'/ilanlar'} className="flex flex-row items-center justify-center text-xl font-bold hover:text-blue-600">
+        Tüm İlanlar <span><ChevronRight/></span>
+        </Link>
+        </div>
         
         <div className="flex lg:flex-row flex-col justify-between">
           {samplePosts.map((post) => (
