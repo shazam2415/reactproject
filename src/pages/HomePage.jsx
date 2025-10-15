@@ -56,20 +56,20 @@ function HomePage() {
         <p className="text-sm lg:text-xl text-gray-600 w-full p-1">
           <span className="font-bold text-blue-600">Evine Dön</span>, kaybolan evcil hayvanlarınızı bulmanıza veya bulduğunuz sahipsiz dostlarımızı yuvalarına kavuşturmanıza yardımcı olan bir topluluk platformudur.
         </p>
-        <img src="/exotic-pet-home.jpg" alt="" className="lg:h-64 h-32 w-auto rounded border" />
+        <img src="/exotic-pet-home.jpg" alt="" className="lg:h-64 h-52 w-auto rounded border" />
         </div>
       </section>
 
       {/* 2. Son İlanlar */}
       <section>
-        <div className="flex flex-row items-center justify-between pb-5">
+        <div className="flex flex-row items-center justify-between p-5">
         <h2 className="text-3xl font-bold text-gray-800">Son İlanlar</h2>
         <Link to={'/ilanlar'} className="flex flex-row items-center justify-center text-xl font-bold hover:text-blue-600">
         Tüm İlanlar <span><ChevronRight/></span>
         </Link>
         </div>
         
-        <div className="flex lg:flex-row flex-col justify-between">
+        <div className="flex lg:flex-row flex-col items-center space-y-8 lg:space-y-0 justify-between">
           {samplePosts.map((post) => (
             <PostCard key={post.id} post={post}/>
           ))}

@@ -8,7 +8,7 @@ function PostCard({ post }) {
 
   return (
   <div className="group">
-      <div className="w-64 h-96 perspective-1000">
+      <div className="lg:w-64 w-72 h-96 perspective-1000">
         <div className={`relative w-full h-full transition-transform duration-700 transform-style-3d border-2 border-gray-200 rounded-2xl
         ${isFlipped ? 'rotate-y-180' : '' }`}
         style={{ transformStyle: 'preserve-3d' }}
