@@ -5,6 +5,10 @@ import { useAuth } from '../context/AuthContext'; // YENİ: AuthContext'i import
 import { FaUserCircle, FaMapMarkerAlt, FaInfoCircle, FaEdit, FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 
+// YENİ: SweetAlert2'yi ve CSS'ini import et
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
 function PostDetailPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,37 +62,43 @@ function PostDetailPage() {
 
   const isOwner = user && user.id === post.user_id;
 
-  const handleDelete = async () => {
-    if (window.confirm('Bu ilanı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
-
-      const toastId = toast.loading("İlan siliniyor..."); // Yükleniyor bildirimi
-
-      try {
-        await apiClient.delete(`/posts/${ilanId}`);
-        
-        // Başarılı olursa, yükleniyor bildirimini başarı bildirimiyle güncelle
-        toast.update(toastId, { 
-          render: "İlan başarıyla silindi!", 
-          type: "success", 
-          isLoading: false, 
-          autoClose: 2000 
-        });
-
-        // 2 saniye sonra ana sayfaya yönlendir
-        setTimeout(() => {
-          navigate('/');
-        }, 2000);
-      } catch (err) {
-        console.error("İlan silinirken hata:", err);
-        // Hata olursa, yükleniyor bildirimini hata bildirimiyle güncelle
-        toast.update(toastId, { 
-          render: "İlan silinirken bir hata oluştu.", 
-          type: "error", 
-          isLoading: false, 
-          autoClose: 3000 
-        });
+  const handleDelete = () => {
+    // İşte sihir burada başlıyor. window.confirm yerine Swal.fire() kullanıyoruz.
+    Swal.fire({
+      title: 'Emin misiniz?',
+      text: "Bu ilanı silmek üzeresiniz. Bu işlem geri alınamaz!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Evet, sil!',
+      cancelButtonText: 'İptal'
+    }).then(async (result) => {
+      // Kullanıcı "Evet, sil!" butonuna basarsa...
+      if (result.isConfirmed) {
+        const toastId = toast.loading("İlan siliniyor...");
+        try {
+          await apiClient.delete(`/posts/${ilanId}`);
+          toast.update(toastId, { 
+            render: "İlan başarıyla silindi!", 
+            type: "success", 
+            isLoading: false, 
+            autoClose: 2000 
+          });
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+        } catch (err) {
+          console.error("İlan silinirken hata:", err);
+          toast.update(toastId, { 
+            render: "İlan silinirken bir hata oluştu.", 
+            type: "error", 
+            isLoading: false, 
+            autoClose: 3000 
+          });
+        }
       }
-    }
+    });
   };
 
   const imageUrl = post.image_url 

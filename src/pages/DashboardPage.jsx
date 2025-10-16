@@ -1,82 +1,62 @@
+// src/pages/DashboardPage.jsx
+
+import React, { useState, useEffect } from 'react';
+import apiClient from '../api/axiosConfig.js';
+import { useAuth } from '../context/AuthContext';
+import PostCard from '../components/PostCard';
+import Spinner from '../components/Spinner';
 import { Link } from 'react-router-dom';
 
-// Sadece bu kullanıcıya ait olduğunu varsaydığımız birkaç ilan.
-const sampleUserPosts = [
-  { id: 1, status: 'Kayıp', name: 'Boncuk', city: 'İstanbul', district: 'Kadıköy', imageUrl: 'https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=100&h=100&fit=crop' },
-  { id: 4, status: 'Kayıp', name: 'Karabaş', city: 'İstanbul', district: 'Beşiktaş', imageUrl: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=100&h=100&fit=crop' },
-  { id: 5, status: 'Bulundu', name: 'Pamuk', city: 'Bursa', district: 'Nilüfer', imageUrl: 'https://images.unsplash.com/photo-1574158622682-e40e6984100d?w=100&h=100&fit=crop' },
-];
+// Component adını DashboardPage olarak değiştir
+function DashboardPage() { 
+  const { user } = useAuth(); // Sadece user bilgisi yeterli, token'a gerek yok
+  const [myPosts, setMyPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchMyPosts = async () => {
+      try {
+        const response = await apiClient.get('/posts/my-posts');
+        setMyPosts(response.data);
+      } catch (err) {
+        console.error("İlanlarım çekilirken hata:", err);
+        setError('İlanlar yüklenirken bir sorun oluştu.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyPosts();
+  }, []); // Bağımlılık dizisi boş kalabilir
 
-function DashboardPage() {
+  if (loading) return <div className="flex justify-center mt-20"><Spinner /></div>;
+  if (error) return <p className="text-center text-red-500">{error}</p>;
+
   return (
-    <div className="w-full min-h-screen">
-      {/* Sayfa Başlığı ve Yeni İlan Butonu */}
-      <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between mb-8">
-        <div>
-          <h1 className="text-3xl font-extrabold text-gray-900">Panelim</h1>
-          <p className="mt-1 text-md text-gray-500">
-            Yayınladığınız ilanları buradan yönetebilirsiniz.
-          </p>
-        </div>
-        <div className="mt-3 sm:mt-0 sm:ml-4">
-          <Link
-            to="/ilan-ver"
-            className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            Yeni İlan Oluştur
-          </Link>
-        </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="text-center mb-10">
+        {/* Başlığı Dashboard'a uygun hale getir */}
+        <h1 className="text-4xl font-bold text-gray-800">Panelim</h1> 
+        <p className="text-lg text-gray-600 mt-2">Hoş geldin {user?.name}, bu sayfada yayınladığın ilanları yönetebilirsin.</p>
       </div>
       
-      {/* İlan Listesi */}
-      <div className="space-y-4">
-        {sampleUserPosts.map((post) => (
-          <div key={post.id} className="bg-white p-4 shadow-md border border-gray-200 flex flex-col sm:flex-row items-center justify-between">
-            {/* Sol Taraf: İlan Bilgisi */}
-            <div className="flex items-center w-full sm:w-auto mb-4 sm:mb-0">
-              <img src={post.imageUrl} alt={post.name} className="w-16 h-16 object-cover mr-4" />
-              <div>
-                <h3 className="text-lg font-bold text-gray-900">{post.name}</h3>
-                <p className="text-sm text-gray-600">{post.city}, {post.district}</p>
-                <span 
-                  className={`mt-1 inline-block px-2 py-0.5 text-xs font-semibold text-white
-                    ${post.status === 'Kayıp' ? 'bg-red-500' : 'bg-green-500'}
-                  `}
-                >
-                  {post.status}
-                </span>
-              </div>
-            </div>
-
-            {/* Sağ Taraf: İşlem Butonları */}
-            <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
-              <Link
-                to={`/ilanlar/${post.id}/duzenle`}
-                className="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
-              >
-                Düzenle
-              </Link>
-              <button
-                type="button"
-                className="px-4 py-2 border border-transparent shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700"
-              >
-                Sil
-              </button>
-            </div>
-          </div>
-        ))}
-        
-        {/* İlan Yoksa Gösterilecek Mesaj (şimdilik yorumda) */}
-        {/* {sampleUserPosts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Henüz hiç ilan yayınlamadınız.</p>
-          </div>
-        )}
-        */}
-      </div>
+      <h2 className="text-2xl font-semibold text-gray-700 mb-6">İlanlarım ({myPosts.length})</h2>
+      {myPosts.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {myPosts.map(post => (
+            <PostCard key={post.id} post={post} />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center bg-white p-8 rounded-lg shadow-md">
+          <p className="text-gray-600">Henüz hiç ilan oluşturmadın.</p>
+          <Link to="/ilan-ver" className="mt-4 inline-block bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700">
+            İlk İlanını Oluştur
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
 
-export default DashboardPage;
+export default DashboardPage; // export adını da değiştir

@@ -36,7 +36,7 @@ function HomePage() {
   const HeroSection = () => {
     if (isAuthenticated) {
       return (
-        <div className="text-center bg-white p-8 border-2 shadow-xl mb-10">
+        <div className="text-center bg-white p-8 border-2 shadow-md mb-10">
           <h1 className="text-4xl font-bold text-gray-800">Tekrar hoş geldin, {user.name}!</h1>
           <p className="mt-4 text-lg text-gray-600">
             Kayıp dostlarımızı bulmaya yardım etmeye hazır mısın?

@@ -19,24 +19,35 @@ router.get('/my-posts', protect, async (req, res) => {
 });
 
 router.get('/', async (req, res) => {
+  // 1. URL'den 'search' sorgu parametresini al (örn: ?search=kedi)
+  const { search } = req.query;
+
   try {
-    // users tablosunu posts tablosuna user_id üzerinden bağla (JOIN)
-    // ve kullanıcının adını da al. En yeni ilanlar en üstte olsun.
-    const allPostsQuery = `
+    // 2. Temel SQL sorgumuzu ve parametreler için boş bir dizi hazırla
+    let allPostsQuery = `
       SELECT 
-        posts.id, 
-        posts.title, 
-        posts.city, 
-        posts.image_url, 
-        posts.created_at, 
+        posts.id, posts.title, posts.city, posts.image_url, posts.created_at, posts.status, 
         users.name AS author_name 
       FROM posts 
-      JOIN users ON posts.user_id = users.id 
-      ORDER BY posts.created_at DESC;
+      JOIN users ON posts.user_id = users.id
     `;
+    const values = [];
 
-    const { rows } = await db.query(allPostsQuery);
+    // 3. Eğer bir arama terimi varsa, SQL sorgusuna WHERE koşulu ekle
+    if (search) {
+      // ILIKE: Büyük/küçük harf duyarsız arama yapar.
+      // %...%: Kelimenin başında veya sonunda başka karakterler olabileceği anlamına gelir.
+      allPostsQuery += ` WHERE posts.title ILIKE $1`;
+      values.push(`%${search}%`);
+    }
+
+    // 4. Son olarak, sıralama koşulunu ekle
+    allPostsQuery += ` ORDER BY posts.created_at DESC;`;
+
+    // 5. Hazırlanan sorguyu ve parametreleri veritabanına gönder
+    const { rows } = await db.query(allPostsQuery, values);
     res.status(200).json(rows);
+    
   } catch (err) {
     console.error('İlanları getirme hatası:', err);
     res.status(500).json({ error: 'Sunucu hatası.' });

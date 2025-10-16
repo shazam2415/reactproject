@@ -29,35 +29,17 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
             </Link>
           </div>
 
-          {isLoggedIn ? (
-            <section className='bg-red-200 hidden lg:flex flex-row'>
-                <input 
-                  type="text" 
-                  placeholder="Şehir veya ilçe ara..."
-                  className="w-full px-3 border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-                />
-                <button className="w-16 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4">
-                  Ara
-                </button>
-          </section>
-          ): (
-            ''
-          )}
-
           {/* Sağ Taraf: Butonlar ve Profil (Desktop) */}
           <div className="hidden lg:block">
             <div className="flex items-center space-x-4">
               
               {isLoggedIn ? (
                 <>
-                <NavLink
-                to="/ilan-ver"
-                className={navLinkStyles}
-              >
-                Yeni İlan Ver
-              </NavLink>
+               <NavLink to="/profilim" className={navLinkStyles}>
+      Profil
+    </NavLink>
                   <NavLink to="/panelim" className={navLinkStyles}>
-                    Panelim
+                    Panel
                   </NavLink>
                   <button onClick={logout} className="text-gray-500 hover:text-gray-600">
                     Çıkış Yap
