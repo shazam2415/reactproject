@@ -4,7 +4,7 @@ import { FaInstagram, FaTwitter, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-gray-300 mt-auto">
+    <footer className="bg-gray-800 text-gray-300 px-96">
       <div className="container mx-auto px-4 lg:px-8 py-12">
         
         {/* Üst Kısım: Linkler ve Bülten */}
@@ -47,12 +47,12 @@ function Footer() {
               <input 
                 type="email" 
                 placeholder="E-posta adresiniz"
-                className="w-full px-4 py-2 text-gray-800 bg-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 text-gray-800 bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
               <button 
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-md transition-colors w-full sm:w-auto"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 transition-colors w-full sm:w-auto"
               >
                 Kaydol
               </button>
@@ -70,16 +70,16 @@ function Footer() {
             &copy; {new Date().getFullYear()} Evine Dön. Tüm hakları saklıdır.
           </p>
           <div className="flex mt-4 sm:mt-0 space-x-5">
-            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white hover:scale-110 transition-colors">
               <FaTwitter size={20} />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white hover:scale-110 transition-colors">
               <FaInstagram size={20} />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white hover:scale-110 transition-colors">
               <FaLinkedin size={20} />
             </a>
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white hover:scale-110 transition-colors">
               <FaGithub size={20} />
             </a>
           </div>

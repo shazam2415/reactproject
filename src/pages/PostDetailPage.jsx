@@ -20,7 +20,7 @@ const samplePost = {
 
 function PostDetailPage() {
   return (
-    <div className="bg-white p-4 sm:p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+    <div className="bg-white p-4 sm:p-8 shadow-lg max-w-4xl mx-auto">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         
         {/* Sol Taraf: Fotoğraf */}
@@ -28,7 +28,7 @@ function PostDetailPage() {
           <img 
             src={samplePost.imageUrl} 
             alt={samplePost.name}
-            className="w-full h-auto rounded-lg object-cover aspect-square"
+            className="w-full h-auto object-cover aspect-square"
           />
         </div>
 
@@ -37,7 +37,7 @@ function PostDetailPage() {
           {/* Durum Etiketi ve İsim */}
           <div>
             <span 
-              className={`inline-block px-4 py-1.5 text-sm font-semibold text-white rounded-full
+              className={`inline-block px-4 py-1.5 text-sm font-semibold text-white
                 ${samplePost.status === 'Kayıp' ? 'bg-red-500' : 'bg-green-500'}
               `}
             >
@@ -77,7 +77,7 @@ function PostDetailPage() {
           <div className="pt-4">
             <a 
               href={`tel:${samplePost.contact.phone}`}
-              className="w-full flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
+              className="w-full flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
             >
               İletişime Geç ({samplePost.contact.phone})
             </a>

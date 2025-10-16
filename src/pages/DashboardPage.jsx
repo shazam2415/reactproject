@@ -10,7 +10,7 @@ const sampleUserPosts = [
 
 function DashboardPage() {
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="w-full">
       {/* Sayfa Başlığı ve Yeni İlan Butonu */}
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between mb-8">
         <div>

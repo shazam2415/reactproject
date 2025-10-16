@@ -12,12 +12,12 @@ function Navbar() {
   // NavLink için stil fonksiyonu
   const navLinkStyles = ({ isActive }) => 
     isActive 
-      ? 'bg-blue-500 px-3 py-2 text-white    text-sm font-medium font-bold' 
-      : 'bg-gray-400 px-3 py-2 text-gray-100 text-sm font-medium font-bold';
+      ? 'bg-blue-500 px-3 py-2 text-white    text-sm font-medium font-bold border border-blue-500' 
+      : 'bg-white px-3 py-2 text-blue-500 text-sm font-medium font-bold border border-blue-500';
 
   return (
-    <nav className="flex justify-center bg-white shadow-sm sticky top-0 z-50">
-      <div className="w-full lg:px-96 px-12">
+    <nav className="flex justify-center bg-white shadow-sm sticky top-0 z-50 px-96">
+      <div className="w-full">
         <div className="flex items-center justify-between h-fit py-4">
           
           {/* Sol Taraf: Logo ve Ana Linkler (Desktop) */}
@@ -41,12 +41,12 @@ function Navbar() {
           {/* Sağ Taraf: Butonlar ve Profil (Desktop) */}
           <div className="hidden lg:block">
             <div className="flex items-center space-x-4">
-              <Link
+              <NavLink
                 to="/ilan-ver"
-                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 transition duration-300"
+                className={navLinkStyles}
               >
                 Yeni İlan Ver
-              </Link>
+              </NavLink>
               {isLoggedIn ? (
                 <>
                   <NavLink to="/panelim" className={navLinkStyles}>
@@ -58,7 +58,7 @@ function Navbar() {
                 </>
               ) : (
                 <NavLink to="/giris" className={navLinkStyles}>
-                  Giriş Yap / Kayıt Ol
+                  Giriş Yap
                 </NavLink>
               )}
             </div>

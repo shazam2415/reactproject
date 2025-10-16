@@ -35,13 +35,13 @@ function PostForm({ existingPost }) {
           <input type="text" name="animal-name" id="animal-name" 
             // Mevcut veriyi input'un başlangıç değeri yap
             defaultValue={existingPost?.name}
-            className="p-2 mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
         </div>
         <div>
           <label htmlFor="animal-type" className="block text-sm font-medium text-gray-700">Türü</label>
           <select id="animal-type" name="animal-type" 
             defaultValue={existingPost?.type}
-            className="p-2 mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
             <option>Kedi</option>
             <option>Köpek</option>
             <option>Kuş</option>
@@ -57,13 +57,13 @@ function PostForm({ existingPost }) {
           <label htmlFor="city" className="block text-sm font-medium text-gray-700">Şehir</label>
           <input type="text" name="city" id="city" 
             defaultValue={existingPost?.city}
-            className="p-2 mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
         </div>
         <div>
           <label htmlFor="district" className="block text-sm font-medium text-gray-700">İlçe</label>
           <input type="text" name="district" id="district" 
             defaultValue={existingPost?.district}
-            className="p-2 mt-1 block border w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
+            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
         </div>
       </div>
 
@@ -73,12 +73,12 @@ function PostForm({ existingPost }) {
         <div className="mt-1 border">
           <textarea rows={4} name="description" id="description" 
             defaultValue={existingPost?.description}
-            className="p-2 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ayırt edici özellikleri..."></textarea>
+            className="p-2 block w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ayırt edici özellikleri..."></textarea>
         </div>
       </div>
       
       <div>
-        <button type="submit" className="flex w-full justify-center rounded-md border border-transparent bg-blue-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-blue-700">
+        <button type="submit" className="flex w-full justify-center border border-transparent bg-blue-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-blue-700">
           {/* Düzenleme moduna göre butonun yazısını değiştir */}
           {isEditMode ? 'Değişiklikleri Kaydet' : 'İlanı Yayınla'}
         </button>

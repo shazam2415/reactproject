@@ -1,17 +1,33 @@
-import { Outlet } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
+import Layout from './Layout';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import PostsListPage from './pages/PostsListPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import CreatePostPage from './pages/CreatePostPage';
+import ProfilePage from './pages/ProfilePage';
+import DashboardPage from './pages/DashboardPage';
+import EditPostPage from './pages/EditPostPage';
+import PostDetailPage from './pages/PostDetailPage';
+
 
 function App() {
   return (
-    <div className="flex flex-col min-h-screen justify-center font-sans">
-      <Navbar />
-      <main className="flex-grow items-center justify-center w-full lg:px-96 py-10">
-        <Outlet />
-      </main>
-      <Footer />
+    
+      <Routes>
+        <Route path='/' element={<Layout />}>
+        <Route index element={<HomePage />} />
+        <Route path="/ilanlar" element={<PostsListPage />} />
+        <Route path="/ilan-ver" element={<CreatePostPage />} />
+        <Route path="/panelim" element={<DashboardPage />} />
+        <Route path="/ilan/:ilanId/duzenle" element={<EditPostPage />} />
+        <Route path="/ilan/:ilanId" element={<PostDetailPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+        <Route path="/giris" element={<LoginPage />} />
+        <Route path="/kayit-ol" element={<RegisterPage />} />
+      </Routes>
 
-    </div>
   );
 }
 
