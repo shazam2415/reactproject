@@ -29,7 +29,8 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
             </Link>
           </div>
 
-          <section className='bg-red-200 hidden lg:flex flex-row'>
+          {isLoggedIn ? (
+            <section className='bg-red-200 hidden lg:flex flex-row'>
                 <input 
                   type="text" 
                   placeholder="Şehir veya ilçe ara..."
@@ -39,6 +40,9 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
                   Ara
                 </button>
           </section>
+          ): (
+            ''
+          )}
 
           {/* Sağ Taraf: Butonlar ve Profil (Desktop) */}
           <div className="hidden lg:block">

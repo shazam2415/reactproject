@@ -22,7 +22,7 @@ function App() {
         <Route path="/panelim" element={<DashboardPage />} />
         <Route path="/ilan/:ilanId/duzenle" element={<EditPostPage />} />
         <Route path="/ilan/:ilanId" element={<PostDetailPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profilim" element={<ProfilePage />} />
         </Route>
         <Route path="/giris" element={<LoginPage />} />
         <Route path="/kayit-ol" element={<RegisterPage />} />

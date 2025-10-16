@@ -38,7 +38,7 @@ function LoginPage() {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
-      <Link to="/" className="text-xl font-bold text-blue-600">
+      <Link to="/" className="absolute top-10 text-xl font-bold text-blue-600">
               🐾 Evine Dön
             </Link>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -98,7 +98,7 @@ function LoginPage() {
               </button>
             </div>
           </form>
-          <p className="text-sm text-center text-gray-600">
+          <p className="mt-8 text-sm text-center text-gray-600">
           Hesabın yok mu?{' '}
           <Link to="/kayit-ol" className="font-medium text-blue-600 hover:underline">
             Kayıt Ol
@@ -106,7 +106,7 @@ function LoginPage() {
         </p>
         </div>
       </div>
-      <div className="text-xl font-bold">
+      <div className="absolute bottom-10 text-xl font-bold">
         <p className="text-sm text-gray-400 text-center sm:text-left">
             &copy; {new Date().getFullYear()} Evine Dön. Tüm hakları saklıdır.
           </p>

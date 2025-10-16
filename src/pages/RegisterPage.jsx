@@ -54,7 +54,7 @@ function RegisterPage() {
 
   return (
     <div className="flex h-screen flex-col items-center justify-center py-12 sm:px-6 lg:px-8">
-      <Link to="/" className="text-xl font-bold text-blue-600">
+      <Link to="/" className="absolute top-0 mt-10 text-xl font-bold text-blue-600">
               🐾 Evine Dön
             </Link>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -113,7 +113,7 @@ function RegisterPage() {
             </button>
           </div>
         </form>
-           <p className="mt-2 text-center text-sm text-gray-600">
+           <p className="mt-8 text-center text-sm text-gray-600">
           Zaten bir hesabın var mı?{' '}
           <Link to="/giris" className="font-medium text-blue-600 hover:text-blue-500">
             Giriş yap
@@ -121,7 +121,7 @@ function RegisterPage() {
         </p>
         </div>
       </div>
-      <div className="text-xl font-bold">
+      <div className="absolute bottom-10 text-xl font-bold">
         <p className="text-sm text-gray-400 text-center sm:text-left">
             &copy; {new Date().getFullYear()} Evine Dön. Tüm hakları saklıdır.
           </p>
