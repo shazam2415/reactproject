@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import 
+import { useAuth } from '../context/AuthContext'
 
 function Navbar() {
+  const { user, logout } = useAuth(); // YENİ: Context'ten kullanıcı bilgisi ve logout fonksiyonunu al
+  const isLoggedIn = !!user; // user objesi varsa true, yoksa false olacak
+
   // Kullanıcının giriş yapıp yapmadığını kontrol etmek için geçici state
   // Gerçek projede bu bilgi Context API veya Supabase'den gelecek
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
+const [isMenuOpen, setIsMenuOpen] = useState(false);  
   // Mobil menünün açık olup olmadığını kontrol eden state
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // NavLink için stil fonksiyonu
   const navLinkStyles = ({ isActive }) => 
@@ -42,18 +43,19 @@ function Navbar() {
           {/* Sağ Taraf: Butonlar ve Profil (Desktop) */}
           <div className="hidden lg:block">
             <div className="flex items-center space-x-4">
-              <NavLink
+              
+              {isLoggedIn ? (
+                <>
+                <NavLink
                 to="/ilan-ver"
                 className={navLinkStyles}
               >
                 Yeni İlan Ver
               </NavLink>
-              {isLoggedIn ? (
-                <>
                   <NavLink to="/panelim" className={navLinkStyles}>
                     Panelim
                   </NavLink>
-                  <button onClick={() => setIsLoggedIn(false)} className="text-gray-500 hover:text-gray-600">
+                  <button onClick={logout} className="text-gray-500 hover:text-gray-600">
                     Çıkış Yap
                   </button>
                 </>
