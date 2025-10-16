@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import 
 
 function Navbar() {
   // Kullanıcının giriş yapıp yapmadığını kontrol etmek için geçici state
@@ -16,7 +17,7 @@ function Navbar() {
       : 'bg-white px-3 py-2 text-blue-500 text-sm font-medium font-bold border border-blue-500';
 
   return (
-    <nav className="flex justify-center bg-white shadow-sm sticky top-0 z-50 px-96">
+    <nav className="flex justify-center bg-white shadow-sm sticky top-0 z-50 lg:px-96 px-10">
       <div className="w-full">
         <div className="flex items-center justify-between h-fit py-4">
           

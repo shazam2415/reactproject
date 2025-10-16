@@ -4,7 +4,7 @@ import { FaInstagram, FaTwitter, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-gray-300 px-96">
+    <footer className="bg-gray-800 text-gray-300 lg:px-96">
       <div className="container mx-auto px-4 lg:px-8 py-12">
         
         {/* Üst Kısım: Linkler ve Bülten */}

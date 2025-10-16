@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { createBrowserRouter, BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext'; // YENİ: AuthProvider'ı import et
 
 // Ana layout bileşenimiz
 import App from './App.jsx';
@@ -69,7 +70,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* The ONLY BrowserRouter should be here */}
     <BrowserRouter>
+    <AuthProvider>
       <App />
+      </AuthProvider>
     </BrowserRouter>
   </React.StrictMode>
 );
