@@ -10,7 +10,7 @@ const sampleUserPosts = [
 
 function DashboardPage() {
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen">
       {/* Sayfa Başlığı ve Yeni İlan Butonu */}
       <div className="pb-5 border-b border-gray-200 sm:flex sm:items-center sm:justify-between mb-8">
         <div>
@@ -52,7 +52,7 @@ function DashboardPage() {
             {/* Sağ Taraf: İşlem Butonları */}
             <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
               <Link
-                to={`/ilan/${post.id}/duzenle`}
+                to={`/ilanlar/${post.id}/duzenle`}
                 className="px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
               >
                 Düzenle

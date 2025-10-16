@@ -1,37 +1,48 @@
 // backend/index.js
 
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const db = require('./db');
-const postRoutes = require('./routes/posts'); // YENİ
-
-// --- YENİ ---
-// Route dosyalarını import et
 const authRoutes = require('./routes/auth');
-// -----------------
+const postRoutes = require('./routes/posts');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// --- 1. Genel Middleware'ler ---
+// Gelen tüm istekler önce buradan geçer.
 app.use(cors());
 app.use(express.json());
 
-// --- YENİ ---
-// Ana route'ları belirle
-app.use('/api/auth', authRoutes);
-app.use('/api/posts', postRoutes); // YENİ
-// -----------------
+// --- 2. Statik Dosya Servisi ---
+// '/uploads' ile başlayan istekler, 'uploads' klasöründeki dosyaları sunar.
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Test route'ları (bunları daha sonra silebilirsin)
+// --- 3. API Rotaları ---
+// API ile ilgili tüm istekler burada yönetilir.
+app.use('/api/auth', authRoutes);
+app.use('/api/posts', postRoutes);
+
+// --- 4. Test ve Kök Rotaları ---
 app.get('/test-db', async (req, res) => {
-  // ... (bu kod aynı kalabilir)
+  try {
+    const result = await db.query('SELECT NOW()');
+    res.json({
+      message: 'Veritabanı bağlantısı başarılı!',
+      time: result.rows[0].now,
+    });
+  } catch (err) {
+    console.error('Veritabanı bağlantı hatası:', err);
+    res.status(500).json({ error: 'Veritabanına bağlanılamadı.' });
+  }
 });
 
 app.get('/', (req, res) => {
   res.json({ message: 'Evine Dön Backend API Çalışıyor! 🐾' });
 });
 
-
+// --- 5. Sunucuyu Başlatma ---
 app.listen(PORT, () => {
   console.log(`Sunucu http://localhost:${PORT} adresinde çalışıyor.`);
 });

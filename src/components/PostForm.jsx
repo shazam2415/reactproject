@@ -1,86 +1,90 @@
-function PostForm({ existingPost }) {
+import React, { useState, useEffect } from 'react';
 
-  const isEditMode = Boolean(existingPost);
+function PostForm({ initialData = {}, onSubmit, isLoading, submitButtonText }) {
+  const [post, setPost] = useState({
+    title: '',
+    description: '',
+    city: '',
+    status: 'kayip',
+    ...initialData,
+  });
+  const [ imageFile, setImageFile ] = useState(null);
+
+  useEffect(() => {
+    setPost(prev => ({ ...prev, ...initialData }));
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setPost(prevPost => ({
+      ...prevPost,
+      [name]: value,
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    setImageFile(e.target.files[0]);
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append('title', post.title);
+    formData.append('description', post.description);
+    formData.append('city', post.city);
+    formData.append('status', post.status);
+
+    if (imageFile) formData.append('image', imageFile);
+
+    onSubmit(formData);
+  };
 
   return (
-    <form className="space-y-6 w-full">
+    <form onSubmit={handleFormSubmit} className="space-y-6">
       <div>
-        <label className="text-base font-medium text-gray-900">İlan Durumu</label>
-        <fieldset className="mt-2">
-
-          <div className="flex items-center space-x-6">
-            <div className="flex items-center">
-
-              <input id="kayip" name="status" type="radio" 
-                defaultChecked={!isEditMode || existingPost.status === 'Kayıp'} 
-                className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"/>
-              <label htmlFor="kayip" className="ml-3 block text-sm font-medium text-gray-700">Kayıp</label>
-
-            </div>
-            <div className="flex items-center">
-              <input id="bulundu" name="status" type="radio" 
-
-                defaultChecked={isEditMode && existingPost.status === 'Bulundu'} 
-                className="h-4 w-4 border-gray-300 text-blue-600 focus:ring-blue-500"/>
-              <label htmlFor="bulundu" className="ml-3 block text-sm font-medium text-gray-700">Bulundu</label>
-            </div>
-          </div>
-        </fieldset>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700">İlan Başlığı</label>
+        <input
+          id="title" name="title" type="text" required value={post.title} onChange={handleChange}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        />
       </div>
-
-      {/* 2. Hayvan Bilgileri */}
-      <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="animal-name" className="block text-sm font-medium text-gray-700">Hayvanın Adı</label>
-          <input type="text" name="animal-name" id="animal-name" 
-            // Mevcut veriyi input'un başlangıç değeri yap
-            defaultValue={existingPost?.name}
-            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
-        </div>
-        <div>
-          <label htmlFor="animal-type" className="block text-sm font-medium text-gray-700">Türü</label>
-          <select id="animal-type" name="animal-type" 
-            defaultValue={existingPost?.type}
-            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            <option>Kedi</option>
-            <option>Köpek</option>
-            <option>Kuş</option>
-            <option>Diğer</option>
-          </select>
-        </div>
-      </div>
-      
-      {/* Diğer alanlar da aynı mantıkla defaultValue alacak... */}
-      {/* 3. Konum Bilgileri */}
-      <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="city" className="block text-sm font-medium text-gray-700">Şehir</label>
-          <input type="text" name="city" id="city" 
-            defaultValue={existingPost?.city}
-            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
-        </div>
-        <div>
-          <label htmlFor="district" className="block text-sm font-medium text-gray-700">İlçe</label>
-          <input type="text" name="district" id="district" 
-            defaultValue={existingPost?.district}
-            className="p-2 mt-1 block border w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"/>
-        </div>
-      </div>
-
-      {/* 4. Açıklama */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700">Açıklama</label>
-        <div className="mt-1 border">
-          <textarea rows={4} name="description" id="description" 
-            defaultValue={existingPost?.description}
-            className="p-2 block w-full border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" placeholder="Ayırt edici özellikleri..."></textarea>
-        </div>
+        <textarea
+          id="description" name="description" rows="4" value={post.description} onChange={handleChange}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        />
       </div>
-      
       <div>
-        <button type="submit" className="flex w-full justify-center border border-transparent bg-blue-600 py-3 px-4 text-base font-medium text-white shadow-sm hover:bg-blue-700">
-          {/* Düzenleme moduna göre butonun yazısını değiştir */}
-          {isEditMode ? 'Değişiklikleri Kaydet' : 'İlanı Yayınla'}
+        <label htmlFor="city" className="block text-sm font-medium text-gray-700">Şehir</label>
+        <input
+          id="city" name="city" type="text" required value={post.city} onChange={handleChange}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        />
+      </div>
+      <div>
+        <label htmlFor="status" className="block text-sm font-medium text-gray-700">Durum</label>
+        <select
+          id="status" name="status" value={post.status} onChange={handleChange}
+          className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+        >
+          <option value="kayip">Kayıp</option>
+          <option value="bulundu">Bulundu</option>
+        </select>
+      </div>
+      <div>
+        <label htmlFor="image" className="block text-sm font-medium text-gray-700">İlan Resmi</label>
+        <input
+          id="image" name="image" type="file" onChange={handleFileChange}
+          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+        />
+      </div>
+      <div>
+        <button
+          type="submit" disabled={isLoading}
+          className="w-full px-4 py-2 font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
+        >
+          {isLoading ? 'İşlem Sürüyor...' : submitButtonText}
         </button>
       </div>
     </form>

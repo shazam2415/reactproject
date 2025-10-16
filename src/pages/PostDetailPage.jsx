@@ -1,88 +1,156 @@
-import { Link } from 'react-router-dom';
-
-// Bu sayfada olduğumuzu varsayacağımız tek bir ilan verisi.
-// Normalde bu veri, URL'deki ID'ye göre Supabase'den çekilecek.
-const samplePost = {
-  id: 1,
-  status: 'Kayıp',
-  name: 'Boncuk',
-  type: 'Kedi',
-  city: 'İstanbul',
-  district: 'Kadıköy',
-  date: '12 Ekim 2025',
-  imageUrl: 'https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&auto=format&fit=crop',
-  description: 'Boncuk, 1 yaşında, dişi bir tekir kedidir. En son dün akşam Moda sahilinde görüldü. Boynunda kırmızı bir tasması vardı. Çok uysaldır ama yabancılardan biraz korkar. Lütfen gören olursa iletişime geçsin.',
-  contact: {
-    name: 'Ayşe Yılmaz',
-    phone: '0555 123 45 67',
-  }
-};
+import React, { useState, useEffect } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import apiClient from '../api/axiosConfig.js';import Spinner from '../components/Spinner'; // Yükleniyor ikonu component'in
+import { useAuth } from '../context/AuthContext'; // YENİ: AuthContext'i import et
+import { FaUserCircle, FaMapMarkerAlt, FaInfoCircle, FaEdit, FaTrash } from 'react-icons/fa';
+import { toast } from 'react-toastify';
 
 function PostDetailPage() {
-  return (
-    <div className="bg-white p-4 sm:p-8 shadow-lg max-w-4xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 1. Adım: URL'den 'ilanId' parametresini al
+  const { ilanId } = useParams();
+  const navigate = useNavigate();
+  const { user, token } = useAuth();
+
+  // 2. Adım: Backend'den veriyi çek
+  useEffect(() => {
+    const fetchPost = async () => {
+      try {
+        const response = await apiClient.get(`/posts/${ilanId}`);
+        setPost(response.data);
+      } catch (err) {
+        console.error("İlan detayı çekilirken hata:", err);
+        const errorMessage = err.response?.status === 404
+          ? 'Bu ilan bulunamadı veya kaldırılmış.'
+          : 'Veri yüklenirken bir sorun oluştu.';
+        setError(errorMessage);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [ilanId]); // ilanId değiştiğinde (farklı bir ilana geçildiğinde) tekrar veri çek
+
+  // Yüklenme durumu
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <Spinner />
+      </div>
+    );
+  }
+
+  // Hata durumu
+  if (error) {
+    return (
+      <div className="text-center mt-20">
+        <p className="text-red-500 text-xl">{error}</p>
+        <Link to="/ilanlar" className="mt-4 inline-block bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+          Tüm İlanlara Göz At
+        </Link>
+      </div>
+    );
+  }
+
+  const isOwner = user && user.id === post.user_id;
+
+  const handleDelete = async () => {
+    if (window.confirm('Bu ilanı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.')) {
+
+      const toastId = toast.loading("İlan siliniyor..."); // Yükleniyor bildirimi
+
+      try {
+        await apiClient.delete(`/posts/${ilanId}`);
         
-        {/* Sol Taraf: Fotoğraf */}
-        <div>
+        // Başarılı olursa, yükleniyor bildirimini başarı bildirimiyle güncelle
+        toast.update(toastId, { 
+          render: "İlan başarıyla silindi!", 
+          type: "success", 
+          isLoading: false, 
+          autoClose: 2000 
+        });
+
+        // 2 saniye sonra ana sayfaya yönlendir
+        setTimeout(() => {
+          navigate('/');
+        }, 2000);
+      } catch (err) {
+        console.error("İlan silinirken hata:", err);
+        // Hata olursa, yükleniyor bildirimini hata bildirimiyle güncelle
+        toast.update(toastId, { 
+          render: "İlan silinirken bir hata oluştu.", 
+          type: "error", 
+          isLoading: false, 
+          autoClose: 3000 
+        });
+      }
+    }
+  };
+
+  const imageUrl = post.image_url 
+    ? `http://localhost:3001/${post.image_url}` 
+    : '/default.png';
+
+  // Başarılı veri çekme durumu
+  return (
+    <div className="container min-h-screen mx-auto max-w-4xl px-4 py-8">
+      <div className="bg-white shadow-xl overflow-hidden">
+        {imageUrl && (
           <img 
-            src={samplePost.imageUrl} 
-            alt={samplePost.name}
-            className="w-full h-auto object-cover aspect-square"
+            src={imageUrl} 
+            alt={post.title} 
+            className="w-full h-96 object-cover"
           />
-        </div>
-
-        {/* Sağ Taraf: Detaylar */}
-        <div className="flex flex-col space-y-4">
-          {/* Durum Etiketi ve İsim */}
-          <div>
-            <span 
-              className={`inline-block px-4 py-1.5 text-sm font-semibold text-white
-                ${samplePost.status === 'Kayıp' ? 'bg-red-500' : 'bg-green-500'}
-              `}
-            >
-              {samplePost.status}
-            </span>
-            <h1 className="text-4xl font-extrabold text-gray-900 mt-3">{samplePost.name}</h1>
-            <p className="text-lg text-gray-500">{samplePost.type}</p>
-          </div>
-
-          {/* Detay Bilgileri Listesi */}
-          <div className="border-t border-b border-gray-200 py-4">
-            <dl className="space-y-4">
-              <div className="flex justify-between">
-                <dt className="font-medium text-gray-600">Konum:</dt>
-                <dd className="text-gray-800 text-right">{samplePost.city}, {samplePost.district}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium text-gray-600">Tarih:</dt>
-                <dd className="text-gray-800 text-right">{samplePost.date}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium text-gray-600">İlan Sahibi:</dt>
-                <dd className="text-gray-800 text-right">{samplePost.contact.name}</dd>
-              </div>
-            </dl>
-          </div>
-
-          {/* Açıklama */}
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">Açıklama</h2>
-            <p className="mt-2 text-gray-700 leading-relaxed">
-              {samplePost.description}
-            </p>
-          </div>
+        )}
+        
+        <div className="p-6 md:p-8">
+          <p className={`capitalize font-semibold text-sm ${post.status === 'kayip' ? 'text-red-600' : 'text-green-600'}`}>
+            {post.status}
+          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mt-2">{post.title}</h1>
           
-          {/* İletişim Butonu */}
-          <div className="pt-4">
-            <a 
-              href={`tel:${samplePost.contact.phone}`}
-              className="w-full flex justify-center items-center px-6 py-3 border border-transparent text-base font-medium text-white bg-blue-600 hover:bg-blue-700"
-            >
-              İletişime Geç ({samplePost.contact.phone})
-            </a>
+          <div className="flex items-center text-gray-500 mt-4 space-x-4 text-md">
+            <div className="flex items-center gap-2">
+              <FaMapMarkerAlt />
+              <span>{post.city}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaUserCircle />
+              <span>İlan Sahibi: {post.author_name}</span>
+            </div>
           </div>
 
+          <hr className="my-6" />
+
+          <h2 className="text-2xl font-semibold text-gray-700 mb-3 flex items-center gap-2">
+            <FaInfoCircle />
+            Açıklama
+          </h2>
+          <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+            {post.description || "Bu ilan için bir açıklama girilmemiş."}
+          </p>
+
+          {/* İleride eklenecek "Düzenle" ve "Sil" butonları için alan */}
+          {isOwner && (
+            <div className="mt-8 flex justify-end gap-4">
+              <Link
+                to={`/ilanlar/${ilanId}/duzenle`} // DÜZENLEME SAYFASININ YOLU
+                className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded transition-colors"
+              >
+                <FaEdit /> Düzenle
+              </Link>
+              <button
+                onClick={handleDelete}
+                className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors"
+              >
+                <FaTrash /> Sil
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>

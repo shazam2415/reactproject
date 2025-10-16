@@ -1,51 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
 import { useAuth } from '../context/AuthContext'; // AuthContext'i import ediyoruz
 import PostCard from '../components/PostCard'; // Kendi PostCard component'in
 import Spinner from '../components/Spinner';
 import { ChevronRight } from 'lucide-react';
+import apiClient from '../api/axiosConfig';
 
-// Örnek ilan verileri (daha sonra Supabase'den gelecek)
-const samplePosts = [
-  {
-    id: 1,
-    status: 'Kayıp',
-    name: 'Boncuk',
-    city: 'İstanbul',
-    district: 'Kadıköy',
-    details: 'merhaba bu metin örnek ayrıntı metnidir, bunun yerine kullanıcıların gerçek olarak yazacağı metinler olacaktır',
-    imageUrl: 'https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTB8fGNhdHxlbnwwfHwwfHx8MA%3D%3D',
-  },
-  {
-    id: 2,
-    status: 'Bulundu',
-    name: 'Paşa',
-    city: 'Ankara',
-    district: 'Çankaya',
-    details: 'merhaba bu metin örnek ayrıntı metnidir, bunun yerine kullanıcıların gerçek olarak yazacağı metinler olacaktır',
-    imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8N3x8ZG9nfGVufDB8fDB8fHx8MA%3D%3D',
-  },
-  {
-    id: 3,
-    status: 'Kayıp',
-    name: 'Limon',
-    city: 'İzmir',
-    district: 'Bornova',
-    details: 'merhaba bu metin örnek ayrıntı metnidir, bunun yerine kullanıcıların gerçek olarak yazacağı metinler olacaktır',
-    imageUrl: 'https://images.pexels.com/photos/45201/kitty-cat-kitten-pet-45201.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-  },
-  {
-    id: 4,
-    status: 'Kayıp',
-    name: 'Karabaş',
-    city: 'İstanbul',
-    district: 'Beşiktaş',
-    details: 'merhaba bu metin örnek ayrıntı metnidir, bunun yerine kullanıcıların gerçek olarak yazacağı metinler olacaktır',
-    imageUrl: 'https://images.unsplash.com/photo-1537151625747-768eb6cf92b2?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGRvZ3xlbnwwfHwwfHx8MA%3D%3D',
-  },
-];
-
+const samplePost = [
+  {id:1}
+]
 function HomePage() {
 
   const { isAuthenticated, user } = useAuth();
@@ -56,9 +19,7 @@ function HomePage() {
   useEffect(() => {
     const fetchRecentPosts = async () => {
       try {
-        // Sadece ilk 6 ilanı çekmek için bir limit parametresi ekleyebiliriz (backend destekliyorsa)
-        // Şimdilik tüm ilanları çekip frontend'de sınırlayalım.
-        const response = await axios.get('http://localhost:3001/api/posts');
+        const response = await apiClient.get('/posts');
         setPosts(response.data.slice(0, 6)); // En son 6 ilanı al
       } catch (err) {
         console.error("Son ilanlar çekilirken hata:", err);
@@ -114,29 +75,22 @@ function HomePage() {
 
           {/* 2. Son İlanlar */}
           <section>
-            <div className="flex flex-row items-center justify-between p-5">
-              <h2 className="text-3xl font-bold text-gray-800">Son İlanlar</h2>
-              <Link to={'/ilanlar'} className="flex flex-row items-center justify-center text-xl font-bold hover:text-blue-600">
-                Tüm İlanlar <span><ChevronRight /></span>
-              </Link>
-            </div>
-
-            <div className="flex lg:flex-row flex-col items-center space-y-8 lg:space-y-0 justify-between">
-              {samplePosts.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
+            
           </section>
         </div>
       );
     }
   }
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 min-h-screen">
       <HeroSection />
 
-      <h2 className="text-3xl font-bold mb-6 text-center text-gray-700">En Son Eklenenler</h2>
-      {loading ? (
+<div className="flex flex-row items-center justify-between p-5">
+              <h2 className="text-3xl font-bold text-gray-800">Son İlanlar</h2>
+              <Link to={'/ilanlar'} className="flex flex-row items-center justify-center text-xl font-bold hover:text-blue-600">
+                Tüm İlanlar <span><ChevronRight /></span>
+              </Link>
+            </div>      {loading ? (
         <Spinner />
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>

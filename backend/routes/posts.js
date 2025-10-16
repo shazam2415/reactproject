@@ -3,8 +3,20 @@
 const express = require('express');
 const db = require('../db');
 const { protect } = require('../middleware/authMiddleware'); // Middleware'i import et
-
 const router = express.Router();
+const upload = require('../middleware/uploadMiddleware'); // <-- ADD THIS LINE
+
+router.get('/my-posts', protect, async (req, res) => {
+  const userId = req.user.userId;
+  try {
+    const myPostsQuery = 'SELECT * FROM posts WHERE user_id = $1 ORDER BY created_at DESC';
+    const { rows } = await db.query(myPostsQuery, [userId]);
+    res.status(200).json(rows);
+  } catch (err) {
+    console.error('Kullanıcının ilanları çekilirken hata:', err);
+    res.status(500).json({ error: 'Sunucu hatası.' });
+  }
+});
 
 router.get('/', async (req, res) => {
   try {
@@ -33,9 +45,13 @@ router.get('/', async (req, res) => {
 
 // POST /api/posts - Yeni bir ilan oluştur (KORUMALI)
 // Önce 'protect' middleware'i çalışır, sonra (req, res) fonksiyonu.
-router.post('/', protect, async (req, res) => {
-  const { title, description, city } = req.body;
-  const userId = req.user.userId; // Middleware'in req'e eklediği kullanıcı ID'si
+router.post('/', protect, upload, async (req, res) => {
+  const { title, description, city, status } = req.body; // Metin verileri req.body'den gelir
+  const userId = req.user.userId;
+
+  // Dosya yüklendiyse, dosya yolu req.file.path'ten gelir.
+  // Yüklenmediyse, null olur.
+  const imageUrl = req.file ? req.file.path : null;
 
   if (!title || !city) {
     return res.status(400).json({ error: 'Başlık ve şehir zorunludur.' });
@@ -43,11 +59,12 @@ router.post('/', protect, async (req, res) => {
 
   try {
     const newPostQuery = `
-      INSERT INTO posts (user_id, title, description, city)
-      VALUES ($1, $2, $3, $4)
+      INSERT INTO posts (user_id, title, description, city, status, image_url)
+      VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING *;
     `;
-    const { rows } = await db.query(newPostQuery, [userId, title, description, city]);
+    const values = [userId, title, description, city, status || 'kayip', imageUrl];
+    const { rows } = await db.query(newPostQuery, values);
 
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -85,39 +102,36 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-router.put('/:id', protect, async (req, res) => {
-  const { id } = req.params; // Güncellenecek ilanın ID'si
-  const { title, description, city, status } = req.body; // Formdan gelen yeni veriler
-  const userId = req.user.userId; // Token'dan gelen kullanıcı ID'si
-
-  if (!title || !city || !status) {
-    return res.status(400).json({ error: 'Başlık, şehir ve durum zorunludur.' });
-  }
+router.put('/:id', protect, upload, async (req, res) => {
+  const { id } = req.params;
+  const { title, description, city, status } = req.body;
+  const userId = req.user.userId;
 
   try {
-    // 1. Önce ilanı veritabanından bul ve sahibinin kim olduğunu kontrol et
-    const findPostQuery = 'SELECT user_id FROM posts WHERE id = $1';
+    // 1. First, find the post to check for ownership and get the old image URL
+    const findPostQuery = 'SELECT user_id, image_url FROM posts WHERE id = $1';
     const { rows: postRows } = await db.query(findPostQuery, [id]);
 
     if (postRows.length === 0) {
       return res.status(404).json({ error: 'İlan bulunamadı.' });
     }
-
-    const postOwnerId = postRows[0].user_id;
-
-    // 2. İsteği yapan kullanıcı, ilanın sahibi değilse, yetkisiz hatası ver
-    if (postOwnerId !== userId) {
+    if (postRows[0].user_id !== userId) {
       return res.status(403).json({ error: 'Bu işlemi yapmaya yetkiniz yok.' });
     }
 
-    // 3. Kullanıcı doğruysa, ilanı güncelle
+    // 2. Decide which image URL to save
+    // If a new file is uploaded (`req.file` exists), use its path. Otherwise, keep the old one.
+    const newImageUrl = req.file ? req.file.path : postRows[0].image_url;
+
+    // 3. Update the post in the database with all fields
     const updatePostQuery = `
       UPDATE posts 
-      SET title = $1, description = $2, city = $3, status = $4 
-      WHERE id = $5 
+      SET title = $1, description = $2, city = $3, status = $4, image_url = $5 
+      WHERE id = $6 
       RETURNING *;
     `;
-    const { rows: updatedRows } = await db.query(updatePostQuery, [title, description, city, status, id]);
+    const values = [title, description, city, status, newImageUrl, id];
+    const { rows: updatedRows } = await db.query(updatePostQuery, values);
 
     res.status(200).json(updatedRows[0]);
   } catch (err) {

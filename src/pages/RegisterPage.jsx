@@ -1,7 +1,7 @@
 // src/pages/RegisterPage.jsx
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import apiClient from '../api/axiosConfig';
 
 function RegisterPage() {
   const [name, setName] = useState('');
@@ -29,7 +29,7 @@ function RegisterPage() {
 
     try {
       // Backend'deki register endpoint'ine POST isteği at
-      await axios.post('http://localhost:3001/api/auth/register', {
+      await apiClient.post('/auth/register', {
         name,
         email,
         password,
