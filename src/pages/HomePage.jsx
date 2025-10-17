@@ -62,7 +62,7 @@ function HomePage() {
       return (
         <div className="space-y-12">
           {/* 1. Hero Section: Karşılama Alanı */}
-          <section className="flex flex-col items-center justify-center text-center  p-4   space-y-4  max-w-[1200px]">
+          <section className="flex flex-col items-center justify-center text-center  p-4   space-y-4  max-w-4xl">
             <h1 className="lg:text-5xl text-2xl font-extrabold text-gray-800">
               Kayıp Dostlarımızı <span className="font-bold text-blue-600">Evine Dön</span>dürelim
             </h1>

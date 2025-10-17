@@ -5,7 +5,7 @@ function PostForm({ initialData = {}, onSubmit, isLoading, submitButtonText }) {
     title: '',
     description: '',
     city: '',
-    status: 'kayip',
+    status: 'kayıp',
     ...initialData,
   });
   const [ imageFile, setImageFile ] = useState(null);
@@ -68,8 +68,8 @@ function PostForm({ initialData = {}, onSubmit, isLoading, submitButtonText }) {
           id="status" name="status" value={post.status} onChange={handleChange}
           className="mt-1 w-full px-3 py-2 border border-gray-300 shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         >
-          <option value="kayip">Kayıp</option>
-          <option value="bulundu">Bulundu</option>
+          <option value="kayip">KAYIP</option>
+          <option value="bulundu">BULUNDU</option>
         </select>
       </div>
       <div>

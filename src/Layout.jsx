@@ -9,7 +9,7 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <main className="flex lg:px-96 py-10"> 
+      <main className="flex bg-gray-100 lg:px-96 py-10"> 
         {/* Sayfa içeriği buraya gelecek */}
         <Outlet />
       </main>

@@ -18,9 +18,9 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
       : 'bg-white px-3 py-2 text-blue-500 text-sm font-medium font-bold border border-blue-500';
 
   return (
-    <nav className="flex justify-center bg-white shadow-sm sticky top-0 z-50 lg:px-96 px-10">
-      <div className="w-full">
-        <div className="flex items-center justify-between h-fit py-4">
+    <nav className="flex items-center justify-center bg-white shadow-sm sticky top-0 z-50 w-full">
+      <div className="flex items-center justify-center w-full">
+        <div className="flex items-center justify-between h-fit py-4 w-full max-w-4xl">
           
           {/* Sol Taraf: Logo ve Ana Linkler (Desktop) */}
           <div className="flex items-center">
@@ -88,7 +88,7 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
             {isLoggedIn ? (
               <>
                 <NavLink to="/panelim" className={navLinkStyles + ' block bg-gray-800 text-gray-500'}>Panelim</NavLink>
-                <button onClick={() => { setIsLoggedIn(false); setIsMenuOpen(false); }} className="text-gray-600 hover:bg-gray-200 w-full text-left px-3 py-2 rounded-md text-sm font-medium">
+                <button onClick={logout} className="text-gray-600 hover:bg-gray-200 w-full text-left px-3 py-2 rounded-md text-sm font-medium">
                   Çıkış Yap
                 </button>
               </>

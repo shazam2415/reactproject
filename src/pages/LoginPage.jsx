@@ -37,7 +37,6 @@ function LoginPage() {
       // Hata durumunda da toast kullanmak daha tutarlı olur
       const errorMessage = err.response?.data?.error || 'Giriş yapılamadı.';
       toast.error(errorMessage); // setError yerine toast.error kullan
-      setError(errorMessage); // Form altında göstermek için state'i de güncelleyebiliriz
     } finally {
       setLoading(false);
     }
