@@ -48,7 +48,7 @@ function CreatePostPage() {
   return (
     <div className="container min-h-screen mx-auto max-w-2xl px-4 py-8">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Yeni İlan Oluştur</h1>
-      <div className="bg-white p-8 rounded-lg shadow-md">
+      <div className="bg-white p-8 shadow-xl">
         <PostForm
           initialData={EMPTY_POST}
           onSubmit={handleCreatePost}

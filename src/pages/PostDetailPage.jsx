@@ -86,7 +86,7 @@ function PostDetailPage() {
             autoClose: 2000 
           });
           setTimeout(() => {
-            navigate('/');
+            navigate('/panelim');
           }, 2000);
         } catch (err) {
           console.error("İlan silinirken hata:", err);
