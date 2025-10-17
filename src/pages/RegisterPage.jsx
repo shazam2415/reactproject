@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/axiosConfig';
+import { toast } from 'react-toastify';
 
 function RegisterPage() {
   const [name, setName] = useState('');
@@ -11,14 +12,14 @@ function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
 
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     setError(null);
-    setSuccessMessage(null);
+    setLoading(true);
+
 
     if (password !== passwordConfirm) {
       setError('Girdiğiniz şifreler eşleşmiyor.');
@@ -36,8 +37,7 @@ function RegisterPage() {
       });
 
       // Kayıt başarılıysa
-      setSuccessMessage('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
-
+      toast.success('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
       // Kullanıcının başarı mesajını görmesi için 2 saniye bekle
       setTimeout(() => {
         navigate('/giris');
@@ -46,7 +46,7 @@ function RegisterPage() {
     } catch (err) {
       console.error('Kayıt sırasında hata oluştu:', err);
       const errorMessage = err.response?.data?.error || 'Kayıt başarısız. Lütfen tekrar deneyin.';
-      setError(errorMessage);
+      toast.error(errorMessage); // Hata durumunda da toast kullan
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,6 @@ function RegisterPage() {
           </div>
           
           {error && <p className="text-sm text-center text-red-600">{error}</p>}
-          {successMessage && <p className="text-sm text-center text-green-600">{successMessage}</p>}
 
           <div>
             <button

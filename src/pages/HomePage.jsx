@@ -20,7 +20,8 @@ function HomePage() {
     const fetchRecentPosts = async () => {
       try {
         const response = await apiClient.get('/posts');
-        setPosts(response.data.slice(0, 6)); // En son 6 ilanı al
+        const recentPosts = response.data.posts;
+        setPosts(recentPosts.slice(0, 3)); // En son 6 ilanı al
       } catch (err) {
         console.error("Son ilanlar çekilirken hata:", err);
         setError('İlanlar yüklenirken bir sorun oluştu.');

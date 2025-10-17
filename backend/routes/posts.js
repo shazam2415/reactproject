@@ -18,35 +18,72 @@ router.get('/my-posts', protect, async (req, res) => {
   }
 });
 
+// --- DEĞİŞTİRİLMİŞ GET ALL POSTS ROUTE'U (Sayfalama ve Filtreleme ile) ---
 router.get('/', async (req, res) => {
-  // 1. URL'den 'search' sorgu parametresini al (örn: ?search=kedi)
-  const { search } = req.query;
+  // 1. Sorgu parametrelerini al ve varsayılan değerler ata
+  const { search, city, status } = req.query;
+  const page = parseInt(req.query.page) || 1; // Sayfa numarası, varsayılan 1
+  const limit = parseInt(req.query.limit) || 12; // Sayfa başına ilan sayısı, varsayılan 12
+  const offset = (page - 1) * limit; // Veritabanında nereden başlanacak
 
   try {
-    // 2. Temel SQL sorgumuzu ve parametreler için boş bir dizi hazırla
-    let allPostsQuery = `
+    // --- TEMEL SORGULARIN OLUŞTURULMASI ---
+    let values = [];
+    let whereClauses = [];
+    let paramIndex = 1;
+
+    // Filtreleme koşullarını oluştur (bu kısım aynı)
+    if (search) {
+      whereClauses.push(`posts.title ILIKE $${paramIndex}`);
+      values.push(`%${search}%`);
+      paramIndex++;
+    }
+    if (city) {
+      whereClauses.push(`posts.city ILIKE $${paramIndex}`);
+      values.push(`%${city}%`);
+      paramIndex++;
+    }
+    if (status) {
+      whereClauses.push(`posts.status = $${paramIndex}`);
+      values.push(status);
+      paramIndex++;
+    }
+
+    const whereString = whereClauses.length > 0 ? `WHERE ${whereClauses.join(' AND ')}` : '';
+
+    // --- YENİ ADIM: TOPLAM İLAN SAYISINI HESAPLA ---
+    const countQuery = `SELECT COUNT(*) FROM posts ${whereString}`;
+    const countResult = await db.query(countQuery, values);
+    const totalPosts = parseInt(countResult.rows[0].count);
+    const totalPages = Math.ceil(totalPosts / limit);
+
+    // --- YENİ ADIM: SAYFALANMIŞ VERİYİ ÇEK ---
+    const dataQuery = `
       SELECT 
         posts.id, posts.title, posts.city, posts.image_url, posts.created_at, posts.status, 
         users.name AS author_name 
       FROM posts 
-      JOIN users ON posts.user_id = users.id
+      JOIN users ON posts.user_id = users.id 
+      ${whereString}
+      ORDER BY posts.created_at DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1};
     `;
-    const values = [];
+    
+    // Veri sorgusunun değerlerine LIMIT ve OFFSET'i ekle
+    const dataValues = [...values, limit, offset];
+    const { rows: posts } = await db.query(dataQuery, dataValues);
 
-    // 3. Eğer bir arama terimi varsa, SQL sorgusuna WHERE koşulu ekle
-    if (search) {
-      // ILIKE: Büyük/küçük harf duyarsız arama yapar.
-      // %...%: Kelimenin başında veya sonunda başka karakterler olabileceği anlamına gelir.
-      allPostsQuery += ` WHERE posts.title ILIKE $1`;
-      values.push(`%${search}%`);
-    }
-
-    // 4. Son olarak, sıralama koşulunu ekle
-    allPostsQuery += ` ORDER BY posts.created_at DESC;`;
-
-    // 5. Hazırlanan sorguyu ve parametreleri veritabanına gönder
-    const { rows } = await db.query(allPostsQuery, values);
-    res.status(200).json(rows);
+    // --- YANITI GÖNDER ---
+    // Sadece ilanları değil, sayfalama bilgilerini de gönder
+    res.status(200).json({
+      posts,
+      pagination: {
+        totalPosts,
+        totalPages,
+        currentPage: page,
+        limit,
+      }
+    });
     
   } catch (err) {
     console.error('İlanları getirme hatası:', err);

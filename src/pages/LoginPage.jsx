@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import apiClient from '../api/axiosConfig';
+import { toast } from 'react-toastify';
 
 function LoginPage() {
   const [ email, setEmail ] = useState('');
@@ -25,14 +26,20 @@ function LoginPage() {
 
       login( user, token );
 
-      navigate('/');
-    } catch (err) {
-      console.error('Giriş sırasında hata oluştu:', err);
+      toast.success(`Hoş geldin, ${user.name}!`);
 
-      const errorMessage = err.response?.data?.error || 'Giriş yapılamadı, lütfen bilgilerinizi kontrol ediniz.';
-      setError(errorMessage);
+      // Kullanıcının bildirimi görmesi için küçük bir gecikme ekleyebiliriz (isteğe bağlı)
+      setTimeout(() => {
+        navigate('/');
+      }, 1500); // 1.5 saniye sonra yönlendir
+
+    } catch (err) {
+      // Hata durumunda da toast kullanmak daha tutarlı olur
+      const errorMessage = err.response?.data?.error || 'Giriş yapılamadı.';
+      toast.error(errorMessage); // setError yerine toast.error kullan
+      setError(errorMessage); // Form altında göstermek için state'i de güncelleyebiliriz
     } finally {
-      setLoading(false); // İşlem bitince yüklenme durumunu kapat
+      setLoading(false);
     }
   };
 

@@ -1,7 +1,7 @@
 // src/pages/PostsListPage.jsx
 
 import React, { useState, useEffect } from 'react';
-import apiClient from '../api/axiosConfig.js';
+import apiClient from '../api/axiosConfig.js'; // Import yolu @ alias ile güncellendi
 import PostCard from '../components/PostCard';
 import Spinner from '../components/Spinner';
 import { FaSearch } from 'react-icons/fa';
@@ -11,20 +11,37 @@ function PostsListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // YENİ: İki yeni state ekledik
-  const [searchTerm, setSearchTerm] = useState(''); // Arama kutusunun anlık değerini tutar
-  const [query, setQuery] = useState(''); // Gerçekleşecek olan aramayı tetikler
+  const [queryParams, setQueryParams] = useState({
+    search: '',
+    city: '',
+    status: '',
+    page: 1,
+  });
+
+  const [pagination, setPagination] = useState({});
 
   useEffect(() => {
     const fetchAllPosts = async () => {
+      // Not: useEffect içinde setLoading(true) kullanmak,
+      // her filtre değişiminde ekranın tamamının yanıp sönmesine neden olabilir.
+      // Daha iyi bir UX için, sadece ilk yüklemede veya
+      // sayfa değişimi gibi büyük durumlarda true'ya çekilebilir.
+      // Şimdilik basit tutuyoruz.
+      setLoading(true);
       try {
-        setLoading(true);
-        // URL'yi dinamik olarak oluştur
-        const url = query ? `/posts?search=${query}` : '/posts';
-        const response = await apiClient.get(url);
-        setPosts(response.data);
+        const params = new URLSearchParams(queryParams).toString();
+        const response = await apiClient.get(`/posts?${params}`);
+        
+        if (response.data && Array.isArray(response.data.posts) && response.data.pagination) {
+          setPosts(response.data.posts);
+          setPagination(response.data.pagination);
+        } else {
+          setPosts([]);
+          setPagination({});
+        }
         setError(null);
       } catch (err) {
+        // Eksik olan catch bloğu tamamlandı
         console.error("Tüm ilanlar çekilirken hata oluştu:", err);
         setError('İlanlar yüklenirken bir sorun oluştu.');
       } finally {
@@ -33,38 +50,53 @@ function PostsListPage() {
     };
 
     fetchAllPosts();
-  }, [query]); // useEffect artık 'query' state'ine bağlı, query değişince yeniden çalışacak
+  }, [queryParams]);
 
-  // YENİ: Arama formu gönderildiğinde çalışır
-  const handleSearch = (e) => {
-    e.preventDefault(); // Sayfanın yenilenmesini engelle
-    setQuery(searchTerm); // Asıl aramayı tetikle
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setQueryParams(prev => ({ ...prev, [name]: value, page: 1 }));
+  };
+
+  const handlePageChange = (newPage) => {
+    setQueryParams(prev => ({ ...prev, page: newPage }));
+    window.scrollTo(0, 0); // Sayfa değişince en üste git
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 min-h-screen">
-      <h1 className="text-4xl font-bold mb-4 text-center text-gray-800">Tüm İlanlar</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-4xl font-bold mb-4 text-center text-gray-800">İlanları Keşfet</h1>
 
-      {/* --- YENİ ARAMA FORMU --- */}
-      <div className="mb-8 max-w-lg mx-auto">
-        <form onSubmit={handleSearch} className="flex items-center">
+      {/* Filtreleme alanı tamamlandı */}
+      <div className="mb-8 p-6 bg-white rounded-lg shadow-md">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <input
-            type="text"
-            placeholder="İlan başlığında ara..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            name="search"
+            value={queryParams.search}
+            onChange={handleFilterChange}
+            placeholder="Başlıkta ara..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button
-            type="submit"
-            className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700"
+          <input
+            name="city"
+            value={queryParams.city}
+            onChange={handleFilterChange}
+            placeholder="Şehir ara..."
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <select
+            name="status"
+            value={queryParams.status}
+            onChange={handleFilterChange}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <FaSearch />
-          </button>
-        </form>
+            <option value="">Tüm Durumlar</option>
+            <option value="kayip">Kayıp</option>
+            <option value="bulundu">Bulundu</option>
+          </select>
+        </div>
       </div>
-      {/* ------------------------- */}
 
+      {/* Eksik olan içerik render etme mantığı eklendi */}
       {loading ? (
         <div className="flex justify-center items-center h-64"><Spinner /></div>
       ) : error ? (
@@ -77,8 +109,33 @@ function PostsListPage() {
         </div>
       ) : (
         <p className="text-center text-gray-600 mt-10">
-          Aramanızla eşleşen bir ilan bulunamadı.
+          Filtrelerinizle eşleşen bir ilan bulunamadı.
         </p>
+      )}
+
+      {/* Sayfalama kısmı */}
+      {!loading && posts.length > 0 && pagination.totalPages > 1 && (
+        <div className="mt-8 flex justify-center items-center gap-4">
+          <button
+            onClick={() => handlePageChange(queryParams.page - 1)}
+            disabled={queryParams.page <= 1}
+            className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Önceki
+          </button>
+
+          <span className="font-semibold text-gray-600">
+            Sayfa {pagination.currentPage} / {pagination.totalPages}
+          </span>
+
+          <button
+            onClick={() => handlePageChange(queryParams.page + 1)}
+            disabled={queryParams.page >= pagination.totalPages}
+            className="px-4 py-2 bg-gray-200 text-gray-700 font-semibold rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Sonraki
+          </button>
+        </div>
       )}
     </div>
   );

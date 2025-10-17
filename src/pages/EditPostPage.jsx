@@ -4,6 +4,7 @@ import apiClient from '../api/axiosConfig';
 import { useAuth } from '../context/AuthContext';
 import PostForm from '../components/PostForm';
 import Spinner from '../components/Spinner';
+import { toast } from 'react-toastify';
 
 function EditPostPage() {
   const { ilanId } = useParams();
@@ -61,11 +62,16 @@ function EditPostPage() {
       };
 
       await apiClient.put(`/posts/${ilanId}`, postFormData);
-      navigate(`/ilanlar/${ilanId}`);
 
+      toast.success('İlan başarıyla güncellendi!');
+
+        setTimeout(() => {
+        navigate(`/ilanlar/${ilanId}`);
+      }, 1500);
+      
     } catch (err) {
       console.error("İlan güncellenirken hata:", err);
-      setError('İlan güncellenemedi. Lütfen tekrar deneyin.');
+      toast.error(errorMessage);
     } finally {
       setFormLoading(false);
     }
