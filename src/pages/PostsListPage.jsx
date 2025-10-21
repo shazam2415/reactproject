@@ -5,6 +5,8 @@ import apiClient from '../api/axiosConfig.js'; // Import yolu @ alias ile günce
 import PostCard from '../components/PostCard';
 import Spinner from '../components/Spinner';
 import { FaSearch } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
+import { FiPlus } from 'react-icons/fi';
 
 function PostsListPage() {
   const [posts, setPosts] = useState([]);
@@ -64,9 +66,19 @@ function PostsListPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
+      <div className="absolute flex itemx-center top-4 right-5 z-50 justify-end w-fit px-5">
+        <Link 
+            to="/ilan-ver" 
+            className="mt-4 sm:mt-0 inline-flex items-center bg-blue-600 text-white font-semibold py-2 px-5 shadow-md hover:bg-blue-700 transition duration-200"
+          >
+            <FiPlus className="mr-2" size={20} />
+            Yeni İlan Ver
+          </Link>
+      </div>
 
       {/* Filtreleme alanı tamamlandı */}
       <div className="mb-8">
+        
               <h1 className="text-4xl font-bold mb-4 text-center text-gray-800">İlanları Keşfet</h1>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

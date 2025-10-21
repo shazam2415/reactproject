@@ -9,9 +9,10 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <main className="flex bg-gray-100 lg:px-96 py-10"> 
-        {/* Sayfa içeriği buraya gelecek */}
+      <main className="flex bg-gray-100 items-center justify-center min-h-screen py-10">
+        <div className="flex w-full max-w-4xl">
         <Outlet />
+        </div>
       </main>
       <Footer />
     </>

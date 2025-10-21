@@ -47,6 +47,17 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('user');
   };
 
+  // === YENİ FONKSİYON ===
+  // Kullanıcı bilgilerini (profil resmi, isim vb.) güncellemek için
+  const updateUser = (newUserData) => {
+    // 1. React state'ini güncelle
+    setUser(newUserData);
+    
+    // 2. localStorage'ı da senkronize et (en önemli kısım)
+    localStorage.setItem('user', JSON.stringify(newUserData));
+  };
+  // ======================
+
   // Dışarıya sağlanacak değerler
   const value = {
     user,
@@ -54,6 +65,7 @@ export const AuthProvider = ({ children }) => {
     loading,
     login,
     logout,
+    updateUser, // <-- YENİ FONKSİYONU EKLE
     isAuthenticated: !!token, // Token varsa true, yoksa false döner
   };
 

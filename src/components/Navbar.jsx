@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext'
+import { LogOut as FaLogout } from 'lucide-react';
+import { FaUserCircle } from 'react-icons/fa';
 
 function Navbar() {
   const { user, logout } = useAuth(); // YENİ: Context'ten kullanıcı bilgisi ve logout fonksiyonunu al
@@ -35,14 +37,22 @@ const [isMenuOpen, setIsMenuOpen] = useState(false);
               
               {isLoggedIn ? (
                 <>
-               <NavLink to="/profilim" className={navLinkStyles}>
-      Profil
-    </NavLink>
                   <NavLink to="/panelim" className={navLinkStyles}>
                     Panel
                   </NavLink>
+
+                  { user?.avatarUrl ? (
+                    <Link to="/profilim" className={navLinkStyles}>
+                    <img src={user.avatarUrl} alt="Profil" className="w-10 h-10 rounded-full border border-blue-600 object-cover mr-2 inline-block" />
+                    </Link>
+                  ) : (
+                  <Link to="/profilim" className={navLinkStyles}>
+                  <FaUserCircle className="w-10 h-10 text-gray-400 mr-2 inline-block" />
+                  </Link>
+                  )}
+
                   <button onClick={logout} className="text-gray-500 hover:text-gray-600">
-                    Çıkış Yap
+                  <FaLogout className='text-red-600'/>
                   </button>
                 </>
               ) : (

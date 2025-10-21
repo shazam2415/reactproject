@@ -1,64 +1,107 @@
+// src/pages/HomePage.jsx
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // AuthContext'i import ediyoruz
-import PostCard from '../components/PostCard'; // Kendi PostCard component'in
+import { useAuth } from '../context/AuthContext';
+import PostCard from '../components/PostCard';
 import Spinner from '../components/Spinner';
-import { ChevronRight } from 'lucide-react';
+// İkonları import edelim
+import { ChevronRight, FileText, Bookmark } from 'lucide-react'; 
 import apiClient from '../api/axiosConfig';
 
-const samplePost = [
-  {id:1}
-]
-function HomePage() {
+// Not: samplePost'u sildim, API'den gelen veriyi kullanıyoruz.
 
+function HomePage() {
   const { isAuthenticated, user } = useAuth();
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  
+  // Veri state'lerini ayıralım
+  const [recentPosts, setRecentPosts] = useState([]);
+  const [myPostsSummary, setMyPostsSummary] = useState([]);
+  const [savedPostsSummary, setSavedPostsSummary] = useState([]);
+
+  // Yükleme state'lerini ayıralım
+  const [loadingRecent, setLoadingRecent] = useState(true);
+  const [loadingAuthData, setLoadingAuthData] = useState(true); // Sadece giriş yapmışsa kullanılır
+  
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    // 1. Herkes için son ilanları çek
     const fetchRecentPosts = async () => {
+      setLoadingRecent(true);
       try {
-        const response = await apiClient.get('/posts');
-        const recentPosts = response.data.posts;
-        setPosts(recentPosts.slice(0, 3)); // En son 6 ilanı al
+        // API'den sadece 3 tane istediğimizi belirtelim (veya slice(0,3) devam)
+        const response = await apiClient.get('/posts?limit=3'); 
+        setRecentPosts(response.data.posts); 
       } catch (err) {
         console.error("Son ilanlar çekilirken hata:", err);
-        setError('İlanlar yüklenirken bir sorun oluştu.');
+        setError('Son ilanlar yüklenirken bir sorun oluştu.');
       } finally {
-        setLoading(false);
+        setLoadingRecent(false);
+      }
+    };
+
+    // 2. Sadece giriş yapmış kullanıcılar için ek verileri çek
+    const fetchAuthData = async () => {
+      if (!isAuthenticated) {
+        setLoadingAuthData(false); // Giriş yapmamışsa yükleme bitti sayılır
+        return;
+      }
+      
+      setLoadingAuthData(true);
+      try {
+        // İki isteği aynı anda atalım
+        const [myPostsRes, savedPostsRes] = await Promise.all([
+          apiClient.get('/posts/my-posts?limit=2'), // Panel için özet, 2 tane yeter
+          apiClient.get('/posts/saved?limit=2')     // Kaydedilenler özeti, 2 tane (Varsayımsal endpoint)
+        ]);
+        
+        setMyPostsSummary(myPostsRes.data);
+        setSavedPostsSummary(savedPostsRes.data);
+
+      } catch (err) {
+        console.warn("Kullanıcı özet verileri çekilirken hata:", err);
+        // Bu kritik bir hata değil, sadece özet alanları boş görünür.
+        // O yüzden setError(null) yapmıyoruz.
+      } finally {
+        setLoadingAuthData(false);
       }
     };
 
     fetchRecentPosts();
-  }, []);
+    fetchAuthData();
+    
+    // isAuthenticated değiştiğinde (login/logout) bu effect yeniden çalışsın
+  }, [isAuthenticated]);
 
 
   const HeroSection = () => {
     if (isAuthenticated) {
       return (
-        <div className="text-center bg-white p-8 border-2 shadow-md mb-10">
-          <h1 className="text-4xl font-bold text-gray-800">Tekrar hoş geldin, {user.name}!</h1>
-          <p className="mt-4 text-lg text-gray-600">
+        // Giriş yapmış kullanıcının Hero'sunu biraz daha zenginleştirebiliriz.
+        <div className="text-center bg-white p-8 rounded-lg shadow-md border border-gray-200 mb-12">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-800">Tekrar hoş geldin, {user.name}!</h1>
+          <p className="mt-3 text-lg text-gray-600">
             Kayıp dostlarımızı bulmaya yardım etmeye hazır mısın?
           </p>
-          <div className="mt-6 flex justify-center gap-4">
+          <div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
             <Link
               to="/ilan-ver"
-              className="px-6 py-3 bg-blue-600 text-white font-semibold  shadow-md hover:bg-blue-700 transition-colors"
+              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
             >
               Yeni İlan Ver
             </Link>
             <Link
-              to="/profilim"
-              className="px-6 py-3 bg-gray-200 text-gray-800 font-semibold  hover:bg-gray-300 transition-colors"
+              to="/panelim" 
+              className="px-6 py-3 bg-gray-100 text-gray-800 font-semibold rounded-lg hover:bg-gray-200 transition-colors border border-gray-300"
             >
-              Profilim
+              Panelim
             </Link>
           </div>
         </div>
       );
     } else {
+      // --- ZİYARETÇİ GÖRÜNÜMÜ - DOKUNULMADI ---
       return (
         <div className="space-y-12">
           {/* 1. Hero Section: Karşılama Alanı */}
@@ -73,35 +116,109 @@ function HomePage() {
               <img src="/exotic-pet-home.jpg" alt="" className="lg:h-64 h-52 w-auto rounded border" />
             </div>
           </section>
-
-          {/* 2. Son İlanlar */}
-          <section>
-            
-          </section>
         </div>
       );
     }
   }
+
+  // Helper component (İlan yoksa gösterilecek boş kart)
+  const EmptyAuthSection = ({ title, text, icon }) => (
+    <div className="text-center bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      {icon}
+      <p className="text-md text-gray-700 font-medium mt-2">{title}</p>
+      <p className="text-gray-500 text-sm mt-1">{text}</p>
+    </div>
+  );
+
+
   return (
     <div className="container mx-auto px-4 py-8 min-h-screen">
       <HeroSection />
 
-<div className="flex flex-row items-center justify-between p-5">
-              <h2 className="text-3xl font-bold text-gray-800">Son İlanlar</h2>
-              <Link to={'/ilanlar'} className="flex flex-row items-center justify-center text-xl font-bold hover:text-blue-600">
-                Tüm İlanlar <span><ChevronRight /></span>
-              </Link>
-            </div>      {loading ? (
-        <Spinner />
-      ) : error ? (
-        <p className="text-center text-red-500">{error}</p>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {posts.map(post => (
-            <PostCard key={post.id} post={post} />
-          ))}
+      {/* ===========================================
+        === KULLANICIYA ÖZEL BÖLÜMLER (SADECE AUTH) ===
+        ===========================================
+      */}
+      {isAuthenticated && (
+        <div className="mb-12 space-y-12">
+          {loadingAuthData ? (
+            <Spinner />
+          ) : (
+            <>
+              {/* --- Aktif İlanlarım Özeti --- */}
+              <section>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800">Aktif İlanlarım</h2>
+                  <Link to="/panelim" className="flex items-center text-blue-600 hover:underline font-medium">
+                    Tümünü Yönet <ChevronRight size={20} />
+                  </Link>
+                </div>
+                {myPostsSummary.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {myPostsSummary.map(post => <PostCard key={post.id} post={post} />)}
+                  </div>
+                ) : (
+                  <EmptyAuthSection
+                    title="Aktif İlanın Yok"
+                    text="Yeni bir kayıp/bulundu ilanı vererek başlayabilirsin."
+                    icon={<FileText size={32} className="mx-auto text-gray-400" />}
+                  />
+                )}
+              </section>
+
+              {/* --- Kaydedilen İlanlar Özeti --- */}
+              <section>
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-gray-800">Kaydedilen İlanlar</h2>
+                  <Link to="/kaydedilenler" className="flex items-center text-blue-600 hover:underline font-medium">
+                    Tümünü Gör <ChevronRight size={20} />
+                  </Link>
+                </div>
+                {savedPostsSummary.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {savedPostsSummary.map(post => <PostCard key={post.id} post={post} />)}
+                  </div>
+                ) : (
+                   <EmptyAuthSection
+                    title="Kaydedilen İlanın Yok"
+                    text="İlgini çeken ilanları kaydederek buradan takip edebilirsin."
+                    icon={<Bookmark size={32} className="mx-auto text-gray-400" />}
+                  />
+                )}
+              </section>
+            </>
+          )}
         </div>
       )}
+      {/* === KULLANICIYA ÖZEL BÖLÜMLER SONU === */}
+
+
+      {/* =====================================
+        === GENEL BÖLÜM (HERKES GÖRÜR) ===
+        =====================================
+      */}
+      <section>
+        <div className="flex flex-row items-center justify-between p-5">
+          <h2 className="text-3xl font-bold text-gray-800">Son İlanlar</h2>
+          <Link to={'/ilanlar'} className="flex flex-row items-center justify-center text-xl font-bold hover:text-blue-600">
+            Tüm İlanlar <span><ChevronRight /></span>
+          </Link>
+        </div>
+        
+        {loadingRecent ? (
+          <Spinner />
+        ) : error ? (
+          <p className="text-center text-red-500">{error}</p>
+        ) : recentPosts.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recentPosts.map(post => (
+              <PostCard key={post.id} post={post} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-500">Gösterilecek ilan bulunamadı.</p>
+        )}
+      </section>
     </div>
   );
 }
