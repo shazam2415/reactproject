@@ -4,7 +4,7 @@ import { FaInstagram, FaTwitter, FaLinkedin, FaGithub } from 'react-icons/fa';
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-gray-300 lg:px-96">
+    <footer className="bg-gray-800 text-gray-300  w-full">
       <div className="container mx-auto px-4 lg:px-8 py-12">
         
         {/* Üst Kısım: Linkler ve Bülten */}
@@ -12,8 +12,13 @@ function Footer() {
           
           {/* 1. Sütun: Marka ve Açıklama */}
           <div className="flex flex-col">
-            <h2 className="text-2xl font-bold text-white mb-2">🐾 Evine Dön</h2>
-            <p className="text-gray-400 text-sm leading-relaxed">
+          <div className="flex items-center justify-start mb-4">
+            <Link to="/" className="flex flex-row items-center justify-center">
+              <img src="/src/assets/logo.svg" alt="" className='w-12 h-auto brightness-0 invert' />
+            </Link>
+            <h1 className='text-xl font-bold text-blue-600'> Evine Dön </h1>
+          </div>            
+              <p className="text-gray-400 text-sm leading-relaxed">
               Kayıp dostlarımızı yuvalarına kavuşturmak için bir araya geldik. Sevgiyle bağlan, umutla paylaş.
             </p>
           </div>
